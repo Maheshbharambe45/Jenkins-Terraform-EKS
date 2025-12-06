@@ -4,7 +4,6 @@ locals {
   cluster_name = "hotstar-eks"
 }
 
-
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.7.0"

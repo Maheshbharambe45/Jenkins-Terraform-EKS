@@ -8,13 +8,15 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   enable_irsa = true
-
-  # you can keep this or even drop it; not required for aws-auth now
   authentication_mode = "API"
 
+  cluster_endpoint_public_access        = true
+  cluster_endpoint_private_access       = true
+  cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
+
   eks_managed_node_group_defaults = {
-    ami_type               = "AL2_x86_64"
-    instance_types         = ["t3.medium"]
+    ami_type               = "AL2023_x86_64_STANDARD"
+    instance_types         = ["m7i-flex.large"]
     vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
   }
 
@@ -30,3 +32,4 @@ module "eks" {
     cluster = "hotstar-eks"
   }
 }
+

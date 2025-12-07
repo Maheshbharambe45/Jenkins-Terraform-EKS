@@ -2,9 +2,7 @@ pipeline{
     agent any
 
     environment{
-        AWS_ACCESS_KEY_ID     = credentials('AWS_Access_Key_USR')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_Access_Key_PSW')
-        AWS_DEFAULT_REGION    = "ap-south-1"
+        AWS_DEFAULT_REGION = "ap-south-1"
     }
 
     stages{
@@ -30,7 +28,7 @@ pipeline{
                 }
             }
         }
-        
+
         stage('Terraform Initilzation'){
             steps{sh 'Terraform init'}
         }

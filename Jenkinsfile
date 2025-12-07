@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+    
     environment {
         AWS_DEFAULT_REGION = "ap-south-1"
     }
@@ -56,7 +56,7 @@ pipeline {
 
         stage('Configure EKS & check kubectl working') {
             when {
-                expression { return params.action != 'destroy' }
+                expression { params.action != 'destroy' }
             }
             steps {
                 sh '''

@@ -30,19 +30,19 @@ pipeline{
         }
 
         stage('Terraform Initilzation'){
-            steps{sh 'Terraform init'}
+            steps{sh 'terraform init'}
         }
 
         stage('Terraform validation'){
-            steps{sh 'Terraform validate'}
+            steps{sh 'terraform validate'}
         }
 
         stage('Terraform plan (Blueprint)'){
-            steps{sh 'Terraform plan'}
+            steps{sh 'terraform plan'}
         }
 
         stage('Terraform applying/destroying'){
-            steps{sh 'Terraform $action --auto-approve'}
+            steps{sh 'terraform $action --auto-approve'}
         }
     }
 }

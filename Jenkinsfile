@@ -1,15 +1,16 @@
-pipeline{
+pipeline {
     agent any
 
-    environment{
+    environment {
         AWS_DEFAULT_REGION = "ap-south-1"
     }
 
-    stages{
-        stage('check files'){
-            steps{sh 'ls -l '}
+    stages {
+        stage('Check Files') {
+            steps { 
+                sh 'ls -l' 
+            }
         }
-
 
         stage('Configure AWS CLI') {
             steps {
@@ -29,20 +30,49 @@ pipeline{
             }
         }
 
-        stage('Terraform Initilzation'){
-            steps{sh 'terraform init'}
+        stage('Terraform Initialization') {
+            steps { 
+                sh 'terraform init' 
+            }
         }
 
-        stage('Terraform validation'){
-            steps{sh 'terraform validate'}
+        stage('Terraform Validation') {
+            steps { 
+                sh 'terraform validate' 
+            }
         }
 
-        stage('Terraform plan (Blueprint)'){
-            steps{sh 'terraform plan'}
+        stage('Terraform Plan (Blueprint)') {
+            steps { 
+                sh 'terraform plan' 
+            }
         }
 
-        stage('Terraform applying/destroying'){
-            steps{sh 'terraform $action --auto-approve'}
+        stage('Terraform Apply/Destroy') {
+            steps { 
+                sh "terraform ${params.action} --auto-approve" 
+            }
+        }
+
+        stage('Configure EKS & check kubectl working') {
+            when {
+                expression { return params.action != 'destroy' }
+            }
+            steps {
+                sh '''
+                    echo "Creating EKS access entry..."
+                    aws eks create-access-entry --cluster-name hotstar-eks --principal-arn arn:aws:iam::892706795826:user/Terrafrom-User --type STANDARD --region $AWS_DEFAULT_REGION || echo "Access entry may already exist"
+
+                    echo "Associating access policy..."
+                    aws eks associate-access-policy --cluster-name hotstar-eks --principal-arn arn:aws:iam::892706795826:user/Terrafrom-User --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy --access-scope '{"type":"cluster"}' --region $AWS_DEFAULT_REGION || echo "Policy may already be associated"
+
+                    echo "Updating kubeconfig..."
+                    aws eks update-kubeconfig --name hotstar-eks --region $AWS_DEFAULT_REGION --alias hotstar-eks
+
+                    echo "Checking EKS nodes..."
+                    kubectl get nodes
+                '''
+            }
         }
     }
 }

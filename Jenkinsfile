@@ -12,21 +12,25 @@ pipeline{
             steps{sh 'ls -l '}
         }
 
-        stage('configure aws cli') {
+
+        stage('Configure AWS CLI') {
             steps {
-                sh '''
-                    echo "Configuring AWS CLI..."
-
-                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                    aws configure set region $AWS_DEFAULT_REGION
-
-                    echo "AWS CLI CONFIGURED"
-                    aws configure list
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'AWS_Access_Key', 
+                    usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
+                    sh '''
+                        echo "Configuring AWS CLI..."
+                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                        aws configure set region $AWS_DEFAULT_REGION
+                        aws configure list
+                    '''
+                }
             }
         }
-
+        
         stage('Terraform Initilzation'){
             steps{sh 'Terraform init'}
         }

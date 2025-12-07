@@ -2,9 +2,9 @@ pipeline{
     agent any
 
     environment{
-        AWS_ACCESS_KEY_ID = credentials('AWS_Access_Key')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_Secret_Key')
-        AWS_DEFAULT_REGION = "ap-south-1"
+        AWS_ACCESS_KEY_ID     = credentials('AWS_Access_Key_USR')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_Access_Key_PSW')
+        AWS_DEFAULT_REGION    = "ap-south-1"
     }
 
     stages{
@@ -15,11 +15,14 @@ pipeline{
         stage('configure aws cli') {
             steps {
                 sh '''
+                    echo "Configuring AWS CLI..."
+
                     aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
                     aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
                     aws configure set region $AWS_DEFAULT_REGION
-                    
-                    echo "AWS CLI configured"
+
+                    echo "AWS CLI CONFIGURED"
+                    aws configure list
                 '''
             }
         }

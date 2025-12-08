@@ -15,6 +15,26 @@ You must have installed:
   - Amazon ECR  
   - Kubernetes CLI  
 
+
+## Jenkins Setup Steps
+
+###  Create a New Jenkins Pipeline Job
+- Open Jenkins → New Item → Enter a name → Choose Pipeline → Click OK  
+- Under Pipeline, choose Pipeline script from SCM  
+- Set SCM to Git  
+- Enter your GitHub repository URL:  
+  `https://github.com/Maheshbharambe45/Jenkins-Terraform-EKS.git`  
+- Set the branch - main   
+- Specify the path to your Jenkinsfile (default: Jenkinsfile)  
+
+
+### Configure Credentials
+- Add AWS credentials in Jenkins (Manage Jenkins → Credentials → Add)  
+  - Type: AWS Credentials or Secret Text for Access Key / Secret Key  
+- If using Docker login for ECR, add Docker credentials too
+
+------------------------------------------------------------------------------
+
 ## Terraform Deployment Steps
 
 ### 1. Initialize

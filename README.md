@@ -33,6 +33,8 @@ You must have installed:
   - Type: AWS Credentials or Secret Text for Access Key / Secret Key  
 - If using Docker login for ECR, add Docker credentials too
 
+![Website Screenshot](assets/Screenshot%202025-12-08%20180638.png)
+
 ------------------------------------------------------------------------------
 
 ## Terraform Deployment Steps

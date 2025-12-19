@@ -9,11 +9,8 @@ You must have installed:
 - Terraform 
 - kubectl  
 - Docker  
-- Jenkins with plugins:  
-  - Pipeline  
-  - Docker Pipeline  
-  - Amazon ECR  
-  - Kubernetes CLI  
+- Jenkins
+  I  
 
 
 ## Jenkins Setup Steps

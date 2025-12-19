@@ -10,7 +10,6 @@ You must have installed:
 - kubectl  
 - Docker  
 - Jenkins
-  I  
 
 ## Jenkins Setup Steps
 

@@ -16,12 +16,11 @@ module "eks" {
 
   cluster_encryption_config = [
     {
-       provider = {
-        key_arn = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
-      }
-        resources = ["secrets"]
+      resources = ["secrets"]
+      provider  = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
     }
   ]
+
 
   eks_managed_node_group_defaults = {
     ami_type               = "AL2023_x86_64_STANDARD"

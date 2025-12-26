@@ -14,18 +14,6 @@ module "eks" {
   cluster_endpoint_private_access       = true
   cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
- cluster_encryption_config = [
-  {
-    resources = ["secrets"]
-    provider = {
-      key_arn = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
-    }
-  }
-]
-
-
-
-
   eks_managed_node_group_defaults = {
     ami_type               = "AL2023_x86_64_STANDARD"
     instance_types         = ["m7i-flex.large"]

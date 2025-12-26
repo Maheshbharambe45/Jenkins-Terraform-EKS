@@ -17,7 +17,9 @@ module "eks" {
   cluster_encryption_config = [
     {
       resources = ["secrets"]
-      provider  = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
+      provider  = {
+        key_arn = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
+      }
     }
   ]
 

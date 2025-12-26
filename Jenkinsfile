@@ -36,6 +36,15 @@ pipeline {
             }
         }
 
+        stage('Import existing KMS alias') {
+            steps {
+                sh '''
+                    echo "Importing existing KMS alias..."
+                    terraform import module.eks.module.kms.aws_kms_alias.this["cluster"] alias/eks/hotstar-eks || echo "Alias already imported"
+                '''
+            }
+        }
+        
         stage('Terraform Validation') {
             steps { 
                 sh 'terraform validate' 
@@ -48,14 +57,7 @@ pipeline {
             }
         }
 
-        stage('Import existing KMS alias') {
-            steps {
-                sh '''
-                    echo "Importing existing KMS alias..."
-                    terraform import module.eks.module.kms.aws_kms_alias.this["cluster"] alias/eks/hotstar-eks || echo "Alias already imported"
-                '''
-            }
-        }
+
 
         stage('Terraform Apply/Destroy') {
             steps { 

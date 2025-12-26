@@ -10,6 +10,13 @@ module "eks" {
   enable_irsa = true
   authentication_mode = "API"
 
+  cluster_encryption_config = [
+    {
+       provider_key_arn = "arn:aws:kms:ap-south-1:892706795826:key/6bd9dce8-98e0-49bb-87ea-9615bd6a7dbb"
+      resources        = ["secrets"]
+    }
+  ]
+
   cluster_endpoint_public_access        = true
   cluster_endpoint_private_access       = true
   cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]

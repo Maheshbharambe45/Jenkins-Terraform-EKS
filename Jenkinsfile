@@ -72,6 +72,7 @@ pipeline {
                     aws eks update-kubeconfig --name hotstar-eks --region $AWS_DEFAULT_REGION --alias hotstar-eks
 
                     echo "Checking EKS nodes..."
+                    sleep 30
                     kubectl get nodes
                 '''
             }

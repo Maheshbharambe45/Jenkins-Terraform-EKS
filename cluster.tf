@@ -7,12 +7,12 @@ module "eks" {
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
-  enable_irsa = true
+  enable_irsa          = true
   authentication_mode = "API"
 
-  cluster_endpoint_public_access        = true
-  cluster_endpoint_private_access       = true
-  cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
+  cluster_endpoint_public_access         = true
+  cluster_endpoint_private_access        = true
+  cluster_endpoint_public_access_cidrs   = ["0.0.0.0/0"]
 
   eks_managed_node_group_defaults = {
     ami_type               = "AL2023_x86_64_STANDARD"
@@ -32,4 +32,3 @@ module "eks" {
     cluster = "hotstar-eks"
   }
 }
-

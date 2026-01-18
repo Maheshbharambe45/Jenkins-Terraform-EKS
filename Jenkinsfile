@@ -1,64 +1,127 @@
 pipeline {
     agent any
-    
+
+    parameters {
+        choice(name: 'action', choices: ['apply', 'destroy'], description: 'Terraform Action')
+    }
+
     environment {
         AWS_DEFAULT_REGION = 'ap-south-1'
+        TF_IN_AUTOMATION = 'true'
+    }
+
+    options {
+        disableConcurrentBuilds()
+        timestamps()
     }
 
     stages {
-        stage('Check Files') {
-            steps { 
-                sh 'ls -l' 
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Maheshbharambe45/Jenkins-Terraform-EKS.git'
+                sh 'ls -l'
             }
         }
 
         stage('Configure AWS CLI') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'AWS_Access_Key', 
-                    usernameVariable: 'AWS_ACCESS_KEY_ID', 
+                    credentialsId: 'AWS_Access_Key',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
                     passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                 )]) {
                     sh '''
-                        echo "Configuring AWS CLI..."
                         aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
                         aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
                         aws configure set region $AWS_DEFAULT_REGION
-                        aws configure list
+                        aws sts get-caller-identity
                     '''
                 }
             }
         }
 
-        stage('Terraform Initialization') {
-            steps { 
-                sh 'terraform init' 
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
             }
         }
 
-        stage('Terraform Validation') {
-            steps { 
-                sh 'terraform validate' 
+        stage('Terraform Format Check') {
+            steps {
+                sh 'terraform fmt -check'
             }
         }
 
-        stage('Terraform Plan (Blueprint)') {
-            steps { 
-                sh 'terraform plan' 
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
             }
         }
 
+        stage('Terraform Plan') {
+            when { expression { params.action == 'apply' } }
+            steps {
+                script {
+                    def rc = sh(script: "terraform plan -detailed-exitcode -out=tfplan", returnStatus: true)
+                    if (rc == 0) {
+                        echo "No infra changes"
+                        env.TF_CHANGES = "false"
+                    } else if (rc == 2) {
+                        echo "Infra changes detected"
+                        env.TF_CHANGES = "true"
+                    } else {
+                        error "Terraform plan failed"
+                    }
+                }
+            }
+        }
 
+        stage('Approval Before Apply') {
+            when {
+                allOf {
+                    expression { params.action == 'apply' }
+                    expression { env.TF_CHANGES == "true" }
+                }
+            }
+            steps {
+                input message: "Approve Terraform Apply ?"
+            }
+        }
 
-        stage('Terraform Apply/Destroy') {
-            steps { 
-                sh "terraform ${params.action} --auto-approve" 
+        stage('Terraform Apply') {
+            when {
+                allOf {
+                    expression { params.action == 'apply' }
+                    expression { env.TF_CHANGES == "true" }
+                }
+            }
+            steps {
+                sh 'terraform apply --auto-approve tfplan'
+            }
+        }
+
+        stage('Approval Before Destroy') {
+            when { expression { params.action == 'destroy' } }
+            steps {
+                input message: "Are you sure you want to destroy resources ?"
+            }
+        }
+
+        stage('Terraform Destroy') {
+            when { expression { params.action == 'destroy' } }
+            steps {
+                sh 'terraform destroy --auto-approve'
             }
         }
 
         stage('Configure EKS & check kubectl working') {
             when {
-                expression { params.action != 'destroy' }
+                allOf {
+                    expression { params.action == 'apply' }
+                    expression { env.TF_CHANGES == "true" }
+                }
             }
             steps {
                 sh '''
@@ -76,6 +139,15 @@ pipeline {
                     kubectl get nodes
                 '''
             }
+        }
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed — infrastructure not changed"
+        }
+        success {
+            echo "Pipeline completed successfully"
         }
     }
 }
